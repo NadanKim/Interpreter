@@ -1,2 +1,5 @@
 # Interpreter
 인터프리터 학습을 위한 저장소
+
+## 저장소 구성
+  * BBI 인터프리터 Referenced by [하야시 하루히코.(2012.10.20).만들면서 배우는 인터프리터](http://book.interpark.com/product/BookDisplay.do?_method=detail&sc.shopNo=0000400000&sc.prdNo=211289674)
