@@ -1,5 +1,6 @@
 ﻿#pragma once
 #include <iostream>
+#include <fstream>
 #include <string>
 
 using std::string;
@@ -13,7 +14,7 @@ enum class TokenKind : char
     Assign = 1, Comma, DoubleQuotes,
     Equal, NotEqual, Less, LessEqual, Grater, GraterEqual,
     If, Else, End, Print, Identifier, Int, String, Letter, Digit,
-    EndOfList, Others,
+    EndOfToken, Others,
     MAX = CHAR_MAX
 };
 
@@ -21,7 +22,7 @@ struct Token
 {
     Token()
         :tokenKind(TokenKind::Others), text(""), intValue(0) {}
-    Token(TokenKind tokenKind, const string& text, int intValue)
+    Token(TokenKind tokenKind, const string& text, int intValue = 0)
         :tokenKind(tokenKind), text(text), intValue(intValue) {}
 
     TokenKind tokenKind;
@@ -92,6 +93,76 @@ Identifier identifier[] = {
     {"/", TokenKind::Divide},
     {"=", TokenKind::Assign},
 
-    {"", TokenKind::EndOfList}
+    {"", TokenKind::MAX}
 };
+#pragma endregion
+
+#pragma region 파일 처리
+std::ifstream ifs;
+
+bool OpenFile(char* path)
+{
+    ifs.open(path);
+    
+    if (ifs.is_open())
+    {
+        return true;
+    }
+
+    return false;
+}
+#pragma endregion
+
+
+#pragma region 토큰 처리
+string emptyString{ "" };
+
+Token NextToken()
+{
+    int ch{ NextCharacter() };
+
+    if (ch == EOF)
+    {
+        return Token(TokenKind::EndOfToken, emptyString);
+    }
+
+    while (isspace(ch))
+    { 
+        ch = NextCharacter();
+    };
+
+    TokenKind tokenKind;
+    string str;
+
+    switch (charType[ch])
+    {
+    case TokenKind::Letter:
+        break;
+    case TokenKind::Digit:
+        break;
+    case TokenKind::DoubleQuotes:
+        break;
+    default:
+        break;
+    }
+
+    return Token(tokenKind, str);
+}
+
+int NextCharacter()
+{
+    if (ifs.is_open())
+    {
+        if (ifs.eof())
+        {
+            ifs.close();
+        }
+        else
+        {
+            return ifs.get();
+        }
+    }
+
+    return EOF;
+}
 #pragma endregion
