@@ -62,14 +62,14 @@ void InitializeCharTypeTable()
 }
 #pragma endregion
 
-#pragma region 식별자표
-struct Identifier
+#pragma region 키워드표
+struct Keyword
 {
-    const char* keyWord;
+    const char* str;
     TokenKind type;
 };
 
-Identifier identifier[] = {
+Keyword keywordList[] = {
     {"if", TokenKind::If},
     {"else", TokenKind::Else},
     {"end", TokenKind::End},
@@ -92,15 +92,31 @@ Identifier identifier[] = {
     {"*", TokenKind::Multiply},
     {"/", TokenKind::Divide},
     {"=", TokenKind::Assign},
-
-    {"", TokenKind::MAX}
 };
+
+TokenKind GetKind(const string& str)
+{
+    for (const Keyword& keyword : keywordList)
+    {
+        if (str == keyword.str)
+        {
+            return keyword.type;
+        }
+    }
+
+    if (charType[str[0]] == TokenKind::Letter)
+    {
+        return TokenKind::Identifier;
+    }
+
+    return TokenKind::Others;
+}
 #pragma endregion
 
 #pragma region 파일 처리
 std::ifstream ifs;
 
-bool OpenFile(char* path)
+bool OpenFile(const char* path)
 {
     ifs.open(path);
     
@@ -116,38 +132,7 @@ bool OpenFile(char* path)
 
 #pragma region 토큰 처리
 string emptyString{ "" };
-
-Token NextToken()
-{
-    int ch{ NextCharacter() };
-
-    if (ch == EOF)
-    {
-        return Token(TokenKind::EndOfToken, emptyString);
-    }
-
-    while (isspace(ch))
-    { 
-        ch = NextCharacter();
-    };
-
-    TokenKind tokenKind;
-    string str;
-
-    switch (charType[ch])
-    {
-    case TokenKind::Letter:
-        break;
-    case TokenKind::Digit:
-        break;
-    case TokenKind::DoubleQuotes:
-        break;
-    default:
-        break;
-    }
-
-    return Token(tokenKind, str);
-}
+int ch{ ' ' };
 
 int NextCharacter()
 {
@@ -164,5 +149,88 @@ int NextCharacter()
     }
 
     return EOF;
+}
+
+bool IsSize2Operator(const int ch1, const int ch2)
+{
+    static string size2Operator{ ">= <= == !=" };
+
+    if (ch1 == '\0' || ch2 == '\0')
+    {
+        return false;
+    }
+    
+    string op(sizeof(ch1), ch1);
+    op.append(sizeof(ch2), ch2);
+
+    return size2Operator.find(op) != string::npos;
+}
+
+Token NextToken()
+{
+    if (ch == EOF)
+    {
+        return Token(TokenKind::EndOfToken, emptyString);
+    }
+
+    // 공백 스킵
+    while (isspace(ch))
+    { 
+        ch = NextCharacter();
+    };
+
+    string str{ emptyString };
+    int num{ 0 };
+
+    switch (charType[ch])
+    {
+    case TokenKind::Digit:
+        do
+        {
+            num = num * 10 + (ch - '0');
+            ch = NextCharacter();
+        } while (charType[ch] == TokenKind::Digit);
+        return Token(TokenKind::Int, str, num);
+    case TokenKind::DoubleQuotes:
+        ch = NextCharacter();
+        while (charType[ch] != TokenKind::DoubleQuotes)
+        {
+            str.append(sizeof(ch), ch);
+            ch = NextCharacter();
+            if (ch == EOF)
+            {
+                std::cout << "\"의 짝이 맞지 않습니다.";
+                exit(1);
+            }
+        }
+        ch = NextCharacter();
+        return Token(TokenKind::String, str);
+    case TokenKind::Letter:
+        do
+        {
+            str.append(sizeof(ch), ch);
+            ch = NextCharacter();
+        } while (charType[ch] == TokenKind::Letter);
+        break;
+    default:
+        str.append(sizeof(ch), ch);
+        ch = NextCharacter();
+        if (IsSize2Operator(*str.c_str(), ch))
+        {
+            str.append(sizeof(ch), ch);
+            ch = NextCharacter();
+        }
+        break;
+    }
+
+    TokenKind tokenKind{ GetKind(str) };
+    
+    if (tokenKind == TokenKind::Others)
+    {
+        std::cout << "지원하지 않는 문자입니다.";
+        exit(1);
+    }
+
+    return Token(tokenKind, str);
 }
 #pragma endregion
