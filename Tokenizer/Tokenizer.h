@@ -1,5 +1,6 @@
 ﻿#pragma once
 #include <iostream>
+#include <iomanip>
 #include <fstream>
 #include <string>
 
@@ -13,10 +14,55 @@ enum class TokenKind : char
 
     Assign = 1, Comma, DoubleQuotes,
     Equal, NotEqual, Less, LessEqual, Grater, GraterEqual,
-    If, Else, End, Print, Identifier, Int, String, Letter, Digit,
-    EndOfToken, Others,
-    MAX = CHAR_MAX
+    If, Else, End, 
+    Print,
+    Identifier,
+    Int, String, Letter, Digit,
+    EndOfToken,
+    Others,
 };
+
+string TokenKindToString(TokenKind tokenKind)
+{
+    switch (tokenKind)
+    {
+    case TokenKind::LeftParenthesis: return "LeftParenthesis";
+    case TokenKind::RightParenthesis: return "RightParenthesis";
+
+    case TokenKind::Plus: return "Plus";
+    case TokenKind::Minus: return "Minus";
+    case TokenKind::Multiply: return "Multiply";
+    case TokenKind::Divide: return "Divide";
+
+    case TokenKind::Assign: return "Assign";
+    case TokenKind::Comma: return "Comma";
+    case TokenKind::DoubleQuotes: return "DoubleQuotes";
+
+    case TokenKind::Equal: return "Equal";
+    case TokenKind::NotEqual: return "NotEqual";
+    case TokenKind::Less: return "Less";
+    case TokenKind::LessEqual: return "LessEqual";
+    case TokenKind::Grater: return "Grater";
+    case TokenKind::GraterEqual: return "GraterEqual";
+
+    case TokenKind::If: return "If";
+    case TokenKind::Else: return "Else";
+    case TokenKind::End: return "End";
+
+    case TokenKind::Print: return "Print";
+
+    case TokenKind::Identifier: return "Identifier";
+
+    case TokenKind::Int: return "Int";
+    case TokenKind::String: return "String";
+    case TokenKind::Letter: return "Letter";
+    case TokenKind::Digit: return "Digit";
+
+    case TokenKind::EndOfToken: return "EndOfToken";
+    }
+
+    return "Others";
+}
 
 struct Token
 {
@@ -92,6 +138,8 @@ Keyword keywordList[] = {
     {"*", TokenKind::Multiply},
     {"/", TokenKind::Divide},
     {"=", TokenKind::Assign},
+
+    {",", TokenKind::Comma},
 };
 
 TokenKind GetKind(const string& str)
@@ -153,17 +201,17 @@ int NextCharacter()
 
 bool IsSize2Operator(const int ch1, const int ch2)
 {
-    static string size2Operator{ ">= <= == !=" };
+    static string size2Operator{ "==!=>=<=" };
 
     if (ch1 == '\0' || ch2 == '\0')
     {
         return false;
     }
     
-    string op(sizeof(ch1), ch1);
-    op.append(sizeof(ch2), ch2);
-
-    return size2Operator.find(op) != string::npos;
+    string op(1, ch1);
+    op.append(1, ch2);
+    
+    return size2Operator.find(op, 0) != size2Operator.npos;
 }
 
 Token NextToken()
@@ -195,7 +243,7 @@ Token NextToken()
         ch = NextCharacter();
         while (charType[ch] != TokenKind::DoubleQuotes)
         {
-            str.append(sizeof(ch), ch);
+            str.append(1, ch);
             ch = NextCharacter();
             if (ch == EOF)
             {
@@ -208,16 +256,16 @@ Token NextToken()
     case TokenKind::Letter:
         do
         {
-            str.append(sizeof(ch), ch);
+            str.append(1, ch);
             ch = NextCharacter();
         } while (charType[ch] == TokenKind::Letter);
         break;
     default:
-        str.append(sizeof(ch), ch);
+        str.append(1, ch);
         ch = NextCharacter();
         if (IsSize2Operator(*str.c_str(), ch))
         {
-            str.append(sizeof(ch), ch);
+            str.append(1, ch);
             ch = NextCharacter();
         }
         break;

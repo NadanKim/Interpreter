@@ -6,4 +6,7 @@
   <ItemGroup>
     <ClInclude Include="Tokenizer.h" />
   </ItemGroup>
+  <ItemGroup>
+    <Text Include="test.txt" />
+  </ItemGroup>
 </Project>
