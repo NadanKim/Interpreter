@@ -1,7 +1,7 @@
-#pragma once
+ï»¿#pragma once
 #include <iostream>
 
-#pragma region ¿ì¼±¼øÀ§ ¼³Á¤
+#pragma region ìš°ì„ ìˆœìœ„ ì„¤ì •
 int Order(const int ch)
 {
 	switch (ch)
@@ -19,7 +19,7 @@ int Order(const int ch)
 }
 #pragma endregion
 
-#pragma region ½ºÅÃ Ã³¸®
+#pragma region ìŠ¤íƒ ì²˜ë¦¬
 #define STACK_SIZE 20
 
 int stack[STACK_SIZE];
