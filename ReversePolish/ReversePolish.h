@@ -114,10 +114,14 @@ void Polish(char* str)
 						exit(1);
 					}
 				}
+				else
+				{
+					break;
+				}
 			}
 			break;
 		default:
-			if (Order(*result) == -1)
+			if (Order(*str) == -1)
 			{
 				std::cout << "우선순위가 결정되지 않은 문자입니다.\n";
 				exit(1);
@@ -134,5 +138,77 @@ void Polish(char* str)
 		str++;
 	}
 	*result = '\0';
+}
+#pragma endregion
+
+#pragma region 실행 처리
+// a ~ z를 각각 변수이고 1 ~ 26이 저장되었다고 가정한다.
+int GetValue(char ch)
+{
+	if (islower(ch))
+	{
+		return ch - 'a' + 1;
+	}
+	return 0;
+}
+
+int Execute()
+{
+	int num1, num2;
+	char* str{ polish_result };
+
+	top = 0;
+
+	while(*str != '\0')
+	{
+		// 변수 처리
+		if (islower(*str))
+		{
+			Push(GetValue(*str));
+		}
+		// 숫자 처리
+		else if (isdigit(*str))
+		{
+			Push(*str - '0');
+		}
+		// 연산자 처리
+		else
+		{
+			num2 = Pop();
+			num1 = Pop();
+
+			switch (*str)
+			{
+			case '+':
+				Push(num1 + num2);
+				break;
+			case '-':
+				Push(num1 - num2);
+				break;
+			case '*':
+				Push(num1 * num2);
+				break;
+			case '/':
+				if (num2 == 0)
+				{
+					std::cout << "0으로 나눌 수 없습니다.\n";
+					exit(1);
+				}
+				Push(num1 / num2);
+				break;
+			}
+		}
+
+		str++;
+	}
+	
+	// 결과가 제대로 저장되지 않은 경우
+	if (top != 1)
+	{
+		std::cout << "결과가 존재하지 않습니다.\n";
+		exit(1);
+	}
+
+	return Pop();
 }
 #pragma endregion
