@@ -67,6 +67,7 @@ int Peek()
 
 
 #pragma region 토큰 처리
+Token token;
 char* current;
 int ch{ ' ' };
 
@@ -142,5 +143,128 @@ Token NextToken()
 	ch = NextCharacter();
 
 	return Token(tokenKind);
+}
+
+void CheckToken(TokenKind tokenKind)
+{
+	if (token.tokenKind != tokenKind)
+	{
+		std::cout << "에러 발생!\n";
+		exit(1);
+	}
+}
+#pragma endregion
+
+#pragma region 실행 처리
+int varArr[26];
+
+// 계산 처리
+void Operate(TokenKind op)
+{
+	int num2{ Pop() }, num1{ Pop() };
+
+	switch (op)
+	{
+	case TokenKind::Plus:
+		Push(num1 + num2);
+		break;
+	case TokenKind::Minus:
+		Push(num1 - num2);
+		break;
+	case TokenKind::Multiply:
+		Push(num1 * num2);
+		break;
+	case TokenKind::Divide:
+		if (num2 == 0)
+		{
+			std::cout << "0으로 나눌 수 없습니다.\n";
+			exit(1);
+		}
+		Push(num1 / num2);
+		break;
+	}
+}
+
+// 인자 처리
+void Factor()
+{
+	switch (token.tokenKind)
+	{
+	case TokenKind::VariableName:
+		Push(varArr[token.intValue]);
+		break;
+	case TokenKind::Int:
+		Push(token.intValue);
+		break;
+	case TokenKind::LeftParenthesis:
+		token = NextToken();
+		Expression();
+		CheckToken(TokenKind::RightParenthesis);
+		break;
+	default:
+		std::cout << "에러 발생!\n";
+		exit(1);
+	}
+}
+
+// 식 처리
+void Expression()
+{
+	TokenKind op;
+
+	Term();
+	while (token.tokenKind == TokenKind::Plus || token.tokenKind == TokenKind::Minus)
+	{
+		op = token.tokenKind;
+		token = NextToken();
+		Term();
+		Operate(op);
+	}
+}
+
+// 항 처리
+void Term()
+{
+	TokenKind op;
+
+	Factor();
+	while (token.tokenKind == TokenKind::Multiply || token.tokenKind == TokenKind::Divide)
+	{
+		op = token.tokenKind;
+		token = NextToken();
+		Factor();
+		Operate(op);
+	}
+}
+
+// 문 처리
+void Statement()
+{
+	int variableNumber;
+
+	switch (token.tokenKind)
+	{
+	case TokenKind::VariableName:
+		variableNumber = token.intValue;
+		token = NextToken();
+		CheckToken(TokenKind::Assign);
+
+		token = NextToken();
+		Expression();
+		varArr[variableNumber] = Pop();
+		break;
+	case TokenKind::Print:
+		token = NextToken();
+		Expression();
+		CheckToken(TokenKind::EndOfToken);
+
+		std::cout << "   " << Pop() << '\n';
+		break;
+	default:
+		std::cout << "에러 발생!\n";
+		exit(1);
+	}
+
+	CheckToken(TokenKind::EndOfToken);
 }
 #pragma endregion
