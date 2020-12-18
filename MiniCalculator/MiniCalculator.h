@@ -1,6 +1,10 @@
 #pragma once
 #include <iostream>
 
+void Factor();
+void Expression();
+void Term();
+
 #pragma region 토큰 설정
 enum class TokenKind : char
 {
@@ -205,6 +209,7 @@ void Factor()
 		std::cout << "에러 발생!\n";
 		exit(1);
 	}
+	token = NextToken();
 }
 
 // 식 처리
@@ -259,12 +264,25 @@ void Statement()
 		CheckToken(TokenKind::EndOfToken);
 
 		std::cout << "   " << Pop() << '\n';
-		break;
+		return;
 	default:
 		std::cout << "에러 발생!\n";
 		exit(1);
 	}
 
 	CheckToken(TokenKind::EndOfToken);
+}
+#pragma endregion
+
+#pragma region 입력 처리
+char buffer[80];
+
+void Input()
+{
+	top = 0;
+	std::fill_n(buffer, 80, 0);
+	std::cin.getline(buffer, 80);
+	current = buffer;
+	ch = NextCharacter();
 }
 #pragma endregion
