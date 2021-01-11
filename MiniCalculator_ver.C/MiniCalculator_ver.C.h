@@ -3,7 +3,6 @@
 
 void Factor();
 void Expression();
-void Term();
 void AndExpression();
 void EqualsExpression();
 void RelationExpression();
@@ -335,27 +334,12 @@ void Expression()
 {
 	TokenKind op;
 
-	Term();
-	while (token.tokenKind == TokenKind::Plus || token.tokenKind == TokenKind::Minus)
+	AndExpression();
+	while (token.tokenKind == TokenKind::Or)
 	{
 		op = token.tokenKind;
 		token = NextToken();
-		Term();
-		Operate(op);
-	}
-}
-
-// Ç× Ã³¸®
-void Term()
-{
-	TokenKind op;
-
-	Factor();
-	while (token.tokenKind == TokenKind::Multiply || token.tokenKind == TokenKind::Divide)
-	{
-		op = token.tokenKind;
-		token = NextToken();
-		Factor();
+		AndExpression();
 		Operate(op);
 	}
 }
