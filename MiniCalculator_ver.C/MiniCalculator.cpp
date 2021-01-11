@@ -1,4 +1,4 @@
-﻿#include "MiniCalculator.h"
+﻿#include "MiniCalculator.h";
 
 int main()
 {
